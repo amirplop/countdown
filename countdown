@@ -1,82 +1,362 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        
-        <title> New Years Countdown</title>
-        <style type="text/css">
-            body {
-                background: #f80808;
-                
-            }
-            .countdownContainer{
-                position: absolute;
-                top: 50%;
-                left:50%;
-                transform : translateX(-50%) translateY(-50%);
-                text-align: center;
-                background:#ddd;
-                border: 1px solid #999;
-                padding: 60px;
-                box-shadow: 0 0 50px 30px #ccc;
-            }
-            .info {
-                font-size: 30px;
-                
-            }
-            .tt {
-                font-size: 25px;
-            }
-            .size {
-                font-size: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <table class="countdownContainer">
-            <tr>
-                <td class="tt" colspan="4">New Years Countdown</td>
-            </tr>
-            <tr class="info">
-                <td id="days">0</td>
-                <td id="hours">12</td>
-                <td id="minutes">41</td>
-                <td id="seconds">30</td>
-            </tr>
-            <tr>
-                <td class="size">Days</td>
-                <td class="size">Hours</td>
-                <td class="size">Minutes</td>
-                <td class="size">Seconds</td>
-            </tr>
-        </table>
-        <script type="text/javascript">
-            function countdown(){
-                var now = new Date();
-              
-                var eventDate = new Date(2022, 0, 1);
-                var currentTime = now.getTime();
-                var eventTime = eventDate.getTime();
-                var remTime = eventTime - currentTime;
-                var s = Math.floor(remTime / 1000);
-                var m = Math.floor(s / 60);
-                var h = Math.floor(m / 60);
-                var d = Math.floor(h / 24);
-                h %= 24;
-                m %= 60;
-                s %= 60;
-
-                h = (h < 10) ? "0" + h : h;
-                m = (m < 10) ? "0" + m : m;
-                s = (s < 10) ? "0" + s : s;
-                document.getElementById("days").textContent = d;
-                document.getElementById("days").innerText = d;
-                document.getElementById("hours").textContent = h;
-                document.getElementById("minutes").textContent = m;
-                document.getElementById("seconds").textContent = s;
-                setTimeout(countdown, 1000);
-                
-            }
-            countdown();
-        </script>
-    </body>
-</html>
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/countdown b/countdown
+index c326d34a52311802f57aa4ee2093b3c4b7e3fa23..35b6157c66539315d2be53b80e1c5b38852d5b2a 100644
+--- a/countdown
++++ b/countdown
+@@ -1,82 +1,285 @@
+ <!DOCTYPE html>
+-<html>
++<html lang="en">
+     <head>
+-        
+-        <title> New Years Countdown</title>
+-        <style type="text/css">
++        <meta charset="UTF-8" />
++        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++        <title>Stellar Wish Studio</title>
++        <style>
++            :root {
++                color-scheme: dark;
++                font-family: "Segoe UI", system-ui, sans-serif;
++            }
++            * {
++                box-sizing: border-box;
++                margin: 0;
++                padding: 0;
++            }
+             body {
+-                background: #f80808;
+-                
++                min-height: 100vh;
++                background: radial-gradient(circle at top, #1c1f4a, #04040f 70%);
++                overflow: hidden;
++                color: #f9f7ff;
++            }
++            canvas {
++                position: fixed;
++                inset: 0;
++                width: 100%;
++                height: 100%;
++            }
++            .app {
++                position: relative;
++                z-index: 1;
++                display: grid;
++                gap: 1.5rem;
++                padding: 3rem;
++                max-width: 900px;
++            }
++            .badge {
++                display: inline-flex;
++                align-items: center;
++                gap: 0.5rem;
++                padding: 0.4rem 0.9rem;
++                border-radius: 999px;
++                background: rgba(255, 255, 255, 0.08);
++                border: 1px solid rgba(255, 255, 255, 0.2);
++                font-size: 0.9rem;
++                letter-spacing: 0.08em;
++                text-transform: uppercase;
++            }
++            h1 {
++                font-size: clamp(2.2rem, 4vw, 3.4rem);
++                line-height: 1.1;
++            }
++            p {
++                font-size: 1.1rem;
++                max-width: 50ch;
++                color: rgba(249, 247, 255, 0.75);
+             }
+-            .countdownContainer{
+-                position: absolute;
+-                top: 50%;
+-                left:50%;
+-                transform : translateX(-50%) translateY(-50%);
+-                text-align: center;
+-                background:#ddd;
+-                border: 1px solid #999;
+-                padding: 60px;
+-                box-shadow: 0 0 50px 30px #ccc;
++            .panel {
++                display: grid;
++                gap: 1rem;
++                background: rgba(8, 12, 33, 0.72);
++                border: 1px solid rgba(255, 255, 255, 0.14);
++                border-radius: 24px;
++                padding: 1.5rem;
++                box-shadow: 0 20px 50px rgba(3, 6, 25, 0.5);
++                backdrop-filter: blur(12px);
+             }
+-            .info {
+-                font-size: 30px;
+-                
++            .controls {
++                display: flex;
++                flex-wrap: wrap;
++                gap: 1rem;
+             }
+-            .tt {
+-                font-size: 25px;
++            button {
++                background: linear-gradient(135deg, #7c5cff, #4de0ff);
++                border: none;
++                color: #04040f;
++                padding: 0.8rem 1.4rem;
++                border-radius: 999px;
++                font-weight: 700;
++                cursor: pointer;
++                transition: transform 0.2s ease, box-shadow 0.2s ease;
+             }
+-            .size {
+-                font-size: 20px;
++            button:hover {
++                transform: translateY(-2px) scale(1.02);
++                box-shadow: 0 8px 20px rgba(124, 92, 255, 0.4);
++            }
++            .wish {
++                font-size: clamp(1.3rem, 2vw, 1.7rem);
++                letter-spacing: 0.04em;
++                color: #ffffff;
++            }
++            .orbital {
++                display: flex;
++                gap: 1rem;
++                flex-wrap: wrap;
++                font-size: 0.95rem;
++                color: rgba(249, 247, 255, 0.6);
++            }
++            .orbital span {
++                padding: 0.35rem 0.8rem;
++                border-radius: 999px;
++                border: 1px solid rgba(255, 255, 255, 0.12);
+             }
+         </style>
+     </head>
+     <body>
+-        <table class="countdownContainer">
+-            <tr>
+-                <td class="tt" colspan="4">New Years Countdown</td>
+-            </tr>
+-            <tr class="info">
+-                <td id="days">0</td>
+-                <td id="hours">12</td>
+-                <td id="minutes">41</td>
+-                <td id="seconds">30</td>
+-            </tr>
+-            <tr>
+-                <td class="size">Days</td>
+-                <td class="size">Hours</td>
+-                <td class="size">Minutes</td>
+-                <td class="size">Seconds</td>
+-            </tr>
+-        </table>
+-        <script type="text/javascript">
+-            function countdown(){
+-                var now = new Date();
+-              
+-                var eventDate = new Date(2022, 0, 1);
+-                var currentTime = now.getTime();
+-                var eventTime = eventDate.getTime();
+-                var remTime = eventTime - currentTime;
+-                var s = Math.floor(remTime / 1000);
+-                var m = Math.floor(s / 60);
+-                var h = Math.floor(m / 60);
+-                var d = Math.floor(h / 24);
+-                h %= 24;
+-                m %= 60;
+-                s %= 60;
+-
+-                h = (h < 10) ? "0" + h : h;
+-                m = (m < 10) ? "0" + m : m;
+-                s = (s < 10) ? "0" + s : s;
+-                document.getElementById("days").textContent = d;
+-                document.getElementById("days").innerText = d;
+-                document.getElementById("hours").textContent = h;
+-                document.getElementById("minutes").textContent = m;
+-                document.getElementById("seconds").textContent = s;
+-                setTimeout(countdown, 1000);
+-                
+-            }
+-            countdown();
++        <canvas id="starfield"></canvas>
++        <main class="app">
++            <span class="badge">Live Dreamscape</span>
++            <h1>Stellar Wish Studio</h1>
++            <p>
++                Click to drop a new constellation, move your mouse to bend the starlight, and let the
++                cosmic engine compose a personal wish for you.
++            </p>
++            <section class="panel">
++                <div class="wish" id="wish">"Every spark you send comes back brighter."</div>
++                <div class="controls">
++                    <button id="newWish">Generate new wish</button>
++                    <button id="burst">Release starburst</button>
++                </div>
++                <div class="orbital">
++                    <span id="starCount">Stars: 0</span>
++                    <span id="constellations">Constellations: 0</span>
++                    <span id="spark">Spark intensity: Calm</span>
++                </div>
++            </section>
++        </main>
++        <script>
++            const canvas = document.getElementById("starfield");
++            const ctx = canvas.getContext("2d");
++            const wishOutput = document.getElementById("wish");
++            const starCountOutput = document.getElementById("starCount");
++            const constellationsOutput = document.getElementById("constellations");
++            const sparkOutput = document.getElementById("spark");
++            const newWishButton = document.getElementById("newWish");
++            const burstButton = document.getElementById("burst");
++
++            const wishes = [
++                "Your next idea will glow louder than doubt.",
++                "Every step you take bends the universe in your favor.",
++                "Today is a perfect day to surprise yourself.",
++                "You carry a galaxy of calm inside you.",
++                "Momentum follows the way you show up.",
++                "Your kindness is a meteor shower for someone else.",
++                "The dream you keep returning to is ready.",
++                "Your future self is already grateful.",
++            ];
++
++            const stars = [];
++            const constellations = [];
++            const pointer = { x: 0, y: 0 };
++            let sparkLevel = 0;
++
++            const resize = () => {
++                canvas.width = window.innerWidth * window.devicePixelRatio;
++                canvas.height = window.innerHeight * window.devicePixelRatio;
++                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
++            };
++
++            const createStar = () => ({
++                x: Math.random() * window.innerWidth,
++                y: Math.random() * window.innerHeight,
++                radius: Math.random() * 1.8 + 0.4,
++                speed: Math.random() * 0.3 + 0.1,
++                hue: 220 + Math.random() * 80,
++            });
++
++            const populateStars = () => {
++                stars.length = 0;
++                const total = Math.floor(window.innerWidth / 6);
++                for (let i = 0; i < total; i += 1) {
++                    stars.push(createStar());
++                }
++            };
++
++            const addConstellation = (x, y) => {
++                const nodes = Array.from({ length: 5 }, () => ({
++                    x: x + (Math.random() - 0.5) * 120,
++                    y: y + (Math.random() - 0.5) * 120,
++                }));
++                constellations.push({ nodes, life: 1 });
++            };
++
++            const drawBackground = () => {
++                ctx.clearRect(0, 0, canvas.width, canvas.height);
++                ctx.fillStyle = "rgba(4, 4, 15, 0.2)";
++                ctx.fillRect(0, 0, canvas.width, canvas.height);
++
++                stars.forEach((star) => {
++                    star.y += star.speed;
++                    if (star.y > window.innerHeight + 10) {
++                        star.y = -10;
++                        star.x = Math.random() * window.innerWidth;
++                    }
++                    const glow = sparkLevel * 0.04;
++                    ctx.beginPath();
++                    ctx.fillStyle = `hsla(${star.hue}, 80%, 70%, ${0.8 + glow})`;
++                    ctx.shadowColor = `hsla(${star.hue}, 90%, 70%, ${0.6 + glow})`;
++                    ctx.shadowBlur = 10 + glow * 30;
++                    ctx.arc(star.x, star.y, star.radius + glow, 0, Math.PI * 2);
++                    ctx.fill();
++                });
++            };
++
++            const drawConstellations = () => {
++                constellations.forEach((constellation) => {
++                    constellation.life -= 0.003;
++                    ctx.strokeStyle = `rgba(140, 185, 255, ${constellation.life})`;
++                    ctx.lineWidth = 1.2;
++                    ctx.beginPath();
++                    constellation.nodes.forEach((node, index) => {
++                        const offsetX = (pointer.x - window.innerWidth / 2) * 0.002;
++                        const offsetY = (pointer.y - window.innerHeight / 2) * 0.002;
++                        const x = node.x + offsetX * 40;
++                        const y = node.y + offsetY * 40;
++                        if (index === 0) {
++                            ctx.moveTo(x, y);
++                        } else {
++                            ctx.lineTo(x, y);
++                        }
++                        ctx.fillStyle = "rgba(255,255,255,0.85)";
++                        ctx.beginPath();
++                        ctx.arc(x, y, 3.2, 0, Math.PI * 2);
++                        ctx.fill();
++                    });
++                    ctx.stroke();
++                });
++                while (constellations.length && constellations[0].life <= 0) {
++                    constellations.shift();
++                }
++            };
++
++            const updateStats = () => {
++                starCountOutput.textContent = `Stars: ${stars.length}`;
++                constellationsOutput.textContent = `Constellations: ${constellations.length}`;
++                const label = sparkLevel > 12 ? "Radiant" : sparkLevel > 6 ? "Bright" : "Calm";
++                sparkOutput.textContent = `Spark intensity: ${label}`;
++            };
++
++            const loop = () => {
++                drawBackground();
++                drawConstellations();
++                sparkLevel = Math.max(0, sparkLevel - 0.05);
++                updateStats();
++                requestAnimationFrame(loop);
++            };
++
++            newWishButton.addEventListener("click", () => {
++                const pick = wishes[Math.floor(Math.random() * wishes.length)];
++                wishOutput.textContent = `"${pick}"`;
++                sparkLevel = Math.min(20, sparkLevel + 6);
++            });
++
++            burstButton.addEventListener("click", () => {
++                sparkLevel = 18;
++                for (let i = 0; i < 3; i += 1) {
++                    addConstellation(
++                        Math.random() * window.innerWidth,
++                        Math.random() * window.innerHeight
++                    );
++                }
++            });
++
++            window.addEventListener("mousemove", (event) => {
++                pointer.x = event.clientX;
++                pointer.y = event.clientY;
++            });
++
++            window.addEventListener("click", (event) => {
++                addConstellation(event.clientX, event.clientY);
++                sparkLevel = Math.min(20, sparkLevel + 4);
++            });
++
++            window.addEventListener("resize", () => {
++                resize();
++                populateStars();
++            });
++
++            resize();
++            populateStars();
++            addConstellation(window.innerWidth / 2, window.innerHeight / 2);
++            loop();
+         </script>
+     </body>
+ </html>
+ 
+EOF
+)
